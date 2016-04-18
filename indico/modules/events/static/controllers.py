@@ -49,8 +49,26 @@ class RHStaticSiteBuild(RHStaticSiteBase):
     def _process(self):
         static_site = StaticSite(creator=session.user, event_new=self.event_new)
         db.session.add(static_site)
+        db.session.flush()
+        id_ = static_site.id
         transaction.commit()
-        build_static_site.delay(static_site)
+        #build_static_site.delay(static_site)
+
+        from indico.core.db.sqlalchemy.util.session import update_session_options
+        update_session_options(db)
+        try:
+            import ipdb
+            try:
+                static_site = StaticSite.get_one(id_)
+                build_static_site(static_site)
+            except Exception:
+                with ipdb.launch_ipdb_on_exception():
+                    raise
+                raise
+        finally:
+            from zope.sqlalchemy import ZopeTransactionExtension
+            update_session_options(db, {'extension': ZopeTransactionExtension()})
+
         return redirect(url_for('.list', self._conf))
 
 
