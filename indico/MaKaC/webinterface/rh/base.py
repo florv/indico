@@ -721,6 +721,9 @@ class RH(RequestHandlerBase):
                         break
             self._process_success()
         except Exception as e:
+            import ipdb
+            with ipdb.launch_ipdb_on_exception():
+                raise
             transaction.abort()
             res = self._getMethodByExceptionName(e)(e)
             if isinstance(e, HTTPException) and e.response is not None:
