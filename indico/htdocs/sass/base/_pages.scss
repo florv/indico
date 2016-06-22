@@ -107,6 +107,7 @@
     display: flex;
     color: $banner-color;
     max-width: 800px;
+    justify-content: center;
 
     &.full-width {
         max-width: none;
